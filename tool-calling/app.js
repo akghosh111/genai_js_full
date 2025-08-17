@@ -78,9 +78,11 @@ async function webSearch({ query }) {
     console.log("Calling web search ...");
 
     const response = await tvly.search(query);
-    console.log("Response: ", response);
+    // console.log("Response: ", response);
 
-    const finalResult = response.results.map(result => result.content)
+    const finalResult = response.results.map(result => result.content).join('\n\n');
 
-    return "iPhone was launched on 20th September 2024."
+    
+
+    return finalResult;
 }
