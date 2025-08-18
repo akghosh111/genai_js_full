@@ -7,22 +7,20 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-neutral-900 text-white overflow-x-hidden">
-    <div class="container mx-auto max-w-3xl">
+    <div class="container mx-auto max-w-3xl pb-44" id="chat-container">
         <!-- Messages goes here -->
 
         <!-- user message -->
-        <div class="my-6 bg-neutral-800 p-3 rounded-xl ml-auto max-w-fit">
-            Hi, how are you?
-        </div>
+        
 
         <!-- assistant message -->
         <div class="my-6 bg-neutral-800 p-3 rounded-xl mr-auto max-w-fit">
             Hi, I'm great! What about you?
         </div>
         <!-- Bottom textarea goes here -->
-        <div class="fixed inset-x-0 bottom-0 flex items-center justify-center">
+        <div class="fixed inset-x-0 bottom-0 flex items-center justify-center bg-neutral-900">
             <div class="bg-neutral-800 p-2 rounded-2xl w-full max-w-3xl mb-5">
-                <textarea class="w-full resize-none outline-0 p-3" rows="2"></textarea>
+                <textarea class="w-full resize-none outline-0 p-3" rows="2" id="input"></textarea>
                 <div class="flex justify-end items-center">
                     <button class="bg-white px-4 py-1 rounded-full text-black cursor-pointer hover:bg-gray-300">Ask</button>
                 </div>
