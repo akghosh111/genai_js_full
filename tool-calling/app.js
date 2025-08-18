@@ -20,7 +20,10 @@ async function main() {
 
             }
         ]
-    const completion = await groq.chat.completions.create({
+
+
+    while (true) {
+        const completion = await groq.chat.completions.create({
         model:'llama-3.3-70b-versatile',
         temperature: 0,
         messages: messages,
@@ -55,18 +58,18 @@ async function main() {
 
     if(!toolCalls) {
         console.log(`Assistant: ${completion.choices[0].message.content}`);
-        return
+        break;
     }
 
     //if there are more tools
     for (const tool of toolCalls) {
-        console.log('tool:', tool)
+        // console.log('tool:', tool)
         const functionName = tool.function.name;
         const functionParams = tool.function.arguments;
 
         if(functionName === 'webSearch') {
             const toolResult = await webSearch(JSON.parse(functionParams))
-            console.log("Tool result:", toolResult);
+            // console.log("Tool result:", toolResult);
 
             messages.push({
                 tool_call_id:tool.id,
@@ -77,37 +80,10 @@ async function main() {
         }
     }
 
-    const completion2 = await groq.chat.completions.create({
-        model:'llama-3.3-70b-versatile',
-        temperature: 0,
-        messages: messages,
-        tools:[
-            {
-                "type": "function",
-                "function": {
-                    "name": "webSearch",
-                    "description": "Search the latest information and realtime data on the Internet.",
-                    "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "query": {
-                            "type": "string",
-                            "description": "The search query to perform search on."
-                        },
-                        
-                    },
-                    "required": ["query"]
-                    }
-                }
-            }
-        ],
-        tool_choice: 'auto',
-    });
+    
 
-
-
-
-    console.log(JSON.stringify(completion2.choices[0].message, null, 2));
+    }
+    
 }
 
 main();
