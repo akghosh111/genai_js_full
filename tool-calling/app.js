@@ -14,7 +14,8 @@ async function main() {
                 role: 'system',
                 content:`You are a smart personal assistant who answers the asked questions.
                 You have access to following tools:
-                1. searchWeb({query} : {query: string}) //Search the latest information and realtime data on the Internet.`,
+                1. searchWeb({query} : {query: string}) //Search the latest information and realtime data on the Internet.
+                current date and time: ${new Date().toUTCString()}`,
             },
             // {
             //     role: 'user',
