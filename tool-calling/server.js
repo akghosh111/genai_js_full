@@ -13,11 +13,16 @@ app.get('/', (req, res) => {
 });
 
 app.post('/chat', async (req, res) => {
-    const {message} = req.body;
+    const {message, threadId} = req.body;
+
+    if(!message || !threadId) {
+        res.status(400).json({ message: 'All fields are required!' });
+        return;
+    }
 
     console.log('Message', message);
 
-    const result = await generate(message);
+    const result = await generate(message, threadId);
 
     res.json({ message: result });
 });

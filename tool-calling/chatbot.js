@@ -1,14 +1,18 @@
 import Groq from "groq-sdk";
 import { tavily } from "@tavily/core";
+import NodeCache from "node-cache";
 
 const tvly = tavily({ apiKey: process.env.TAVILY_API_KEY });
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
+const cache = new NodeCache({stdTTL: 60 * 60 * 24}); //24 hours
 
-export async function generate(userMessage) {
+
+
+export async function generate(userMessage, threadId) {
     
 
-    const messages =  [
+    const baseMessages =  [
             {
                 role: 'system',
                 content:`You are a smart personal assistant.
@@ -39,7 +43,9 @@ export async function generate(userMessage) {
             //     content: `When was iPhone 16 launched?`,
 
             // }
-        ]
+    ];
+
+    const messages = cache.get(threadId) ?? baseMessages;
 
 
     
@@ -85,6 +91,10 @@ export async function generate(userMessage) {
     const toolCalls = completion.choices[0].message.tool_calls
 
     if(!toolCalls) {
+        // here we end the chatbot response
+
+        cache.set(threadId, messages);
+        console.log(JSON.stringify(cache.data));
         return completion.choices[0].message.content;
     }
 
