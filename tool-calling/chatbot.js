@@ -56,66 +56,75 @@ export async function generate(userMessage, threadId) {
             content: userMessage,
         })
 
+        const MAX_RETRIES = 10;
+        let count = 0;
+
         while (true) {
-        const completion = await groq.chat.completions.create({
-        model:'llama-3.3-70b-versatile',
-        temperature: 0,
-        messages: messages,
-        tools:[
-            {
-                "type": "function",
-                "function": {
-                    "name": "webSearch",
-                    "description": "Search the latest information and realtime data on the Internet.",
-                    "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "query": {
-                            "type": "string",
-                            "description": "The search query to perform search on."
-                        },
-                        
-                    },
-                    "required": ["query"]
-                    }
-                }
+
+            if (count > MAX_RETRIES) {
+                return "I could not find the result, please try again";
             }
-        ],
-        tool_choice: 'auto',
-    });
+            count++;
+            
+            const completion = await groq.chat.completions.create({
+                model:'llama-3.3-70b-versatile',
+                temperature: 0,
+                messages: messages,
+                tools:[
+                    {
+                        "type": "function",
+                        "function": {
+                            "name": "webSearch",
+                            "description": "Search the latest information and realtime data on the Internet.",
+                            "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "query": {
+                                    "type": "string",
+                                    "description": "The search query to perform search on."
+                                },
+                                
+                            },
+                            "required": ["query"]
+                            }
+                        }
+                    }
+                ],
+                tool_choice: 'auto',
+            });
 
-    //pushing the assistant to messages so that it remains in the history
-    messages.push(completion.choices[0].message);
+        //pushing the assistant to messages so that it remains in the history
+        messages.push(completion.choices[0].message);
 
 
-    const toolCalls = completion.choices[0].message.tool_calls
+        const toolCalls = completion.choices[0].message.tool_calls
 
-    if(!toolCalls) {
-        // here we end the chatbot response
+        if(!toolCalls) {
+            // here we end the chatbot response
 
-        cache.set(threadId, messages);
-        console.log(JSON.stringify(cache.data));
-        return completion.choices[0].message.content;
-    }
-
-    //if there are more tools
-    for (const tool of toolCalls) {
-        // console.log('tool:', tool)
-        const functionName = tool.function.name;
-        const functionParams = tool.function.arguments;
-
-        if(functionName === 'webSearch') {
-            const toolResult = await webSearch(JSON.parse(functionParams))
-            // console.log("Tool result:", toolResult);
-
-            messages.push({
-                tool_call_id:tool.id,
-                role: 'tool',
-                name: functionName,
-                content: toolResult,
-            })
+            cache.set(threadId, messages);
+            console.log(JSON.stringify(cache.data));
+            return completion.choices[0].message.content;
         }
-    }
+
+        //if there are more tools
+        for (const tool of toolCalls) {
+            // console.log('tool:', tool)
+            const functionName = tool.function.name;
+            const functionParams = tool.function.arguments;
+
+            if(functionName === 'webSearch') {
+                const toolResult = await webSearch(JSON.parse(functionParams))
+                // console.log("Tool result:", toolResult);
+
+                messages.push({
+                    tool_call_id:tool.id,
+                    role: 'tool',
+                    name: functionName,
+                    content: toolResult,
+                })
+            }
+        }
 
     
 
