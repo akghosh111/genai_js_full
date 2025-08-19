@@ -18,7 +18,11 @@ async function generate(text) {
     input.value = '';
 
     const assistantMessage = await callServer(text);
-    console.log("Assistant ", assistantMessage);
+
+    const assistantMsgElem = document.createElement('div')
+    assistantMsgElem.className = `my-6 bg-neutral-800 p-3 rounded-xl mr-auto max-w-fit`
+    assistantMsgElem.textContent = assistantMessage
+    chatContainer.appendChild(assistantMsgElem);
 }
 
 async function callServer(inputText) {
