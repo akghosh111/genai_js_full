@@ -7,6 +7,10 @@ const askBtn = document.querySelector('#ask');
 input?.addEventListener('keyup', handleEnter);
 askBtn?.addEventListener('click', handleAsk);
 
+const loading = document.createElement('div');
+loading.className = 'my-6 animate-pulse'
+loading.textContent = 'Thinking ...'
+
 async function generate(text) {
 //     append message to UI 
 //     send it to the LLM 
@@ -17,11 +21,16 @@ async function generate(text) {
     chatContainer.appendChild(msg);
     input.value = '';
 
+    chatContainer.appendChild(loading);
+
     const assistantMessage = await callServer(text);
 
     const assistantMsgElem = document.createElement('div')
     assistantMsgElem.className = `my-6 bg-neutral-800 p-3 rounded-xl mr-auto max-w-fit`
-    assistantMsgElem.textContent = assistantMessage
+    assistantMsgElem.textContent = assistantMessage;
+
+    loading.remove();
+
     chatContainer.appendChild(assistantMsgElem);
 }
 
