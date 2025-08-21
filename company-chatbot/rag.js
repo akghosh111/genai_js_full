@@ -12,3 +12,11 @@
  * 3. Pass User input + relevant info --> LLM
  * 4. LLM gives you the output
  */
+
+import { indexTheDocument } from "./prepare";
+
+
+const filePath = './cg-internal-docs.pdf';
+
+
+indexTheDocument(filePath);
